@@ -1,0 +1,4 @@
+#!/bin/bash
+javac -cp "lib/*:./" $1.java
+java -cp "lib/*:./" $1 
+rm *.class

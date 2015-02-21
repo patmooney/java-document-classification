@@ -41,6 +41,8 @@ sub scrape_page {
 
     my $dom = $self->get_dom();
     my $result_table = $dom->find('table.listingsTable > tbody')->first;
+    return unless ( $result_table );
+
     my @advert_rows = $result_table->children('tr')->each;
 
     my @adverts;
@@ -55,7 +57,11 @@ sub scrape_page {
 
 sub advert_content {
     my ( $self, $advert ) = @_;
-    my $dom = $self->get_dom( $advert->url );
+    my $dom = eval {
+        $self->get_dom( $advert->url );
+    };
+    if ( $@ ){ warn $@; return; }
+
     my $content = $dom->find('div#jobBodyContent')->first() || return undef;
     return $content->all_text;
 }

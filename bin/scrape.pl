@@ -23,13 +23,18 @@ my $ext = Text::TermExtract->new();
 
 mkdir( "$FindBin::Bin/../resources/keywords/" );
 
+my @allowed_categories = @ARGV;
+my %allowed = map { $_ => 1 } @allowed_categories;
 
 CATEGORY:
 foreach my $cat ( @categories ) {
+    my $first_letter = lc(substr( $cat->{name}, 0, 1 ));
+    next unless $allowed{$first_letter};
+
     my $current_page = 1;
     my $cat_map = {};
     PAGE:
-    while ( my @results = $scraper->scrape_page( $cat, $current_page+=10 ) ){
+    while ( my @results = $scraper->scrape_page( $cat, $current_page++ ) ){
         foreach my $result ( @results ) {
             if ( my $content = $scraper->advert_content( $result ) ){
 
@@ -51,6 +56,7 @@ foreach my $cat ( @categories ) {
             last PAGE;
         }
     }
+    $ua->post( 'http://127.0.0.1:47654/save' );
     my $json = JSON::to_json( $cat_map, { ascii => 1 } );    
     File::Slurp::write_file( "$FindBin::Bin/../resources/keywords/" . $cat->{name} . ".json", $json );
 }

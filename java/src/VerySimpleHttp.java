@@ -13,7 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 
 public class VerySimpleHttp {
-    String classifierFileName = "/tmp/classifier.ser";
+    String classifierFileName = "/home/patrick/dev/job-classification/java/src/classifier.ser";
     Classifier classifier = null;
 
     public static void main ( String[] args ) throws Exception {
@@ -89,6 +89,8 @@ public class VerySimpleHttp {
                     case "/seed": this._respond( out, this.routeSeed( httpreq ) ); break;
                     case "/analyse": this._respond( out, this.routeAnalyse( httpreq ) ); break;
                     case "/save": this._respond( out, this.routeSaveClassifier( httpreq ) ); break;
+                    case "/common": this._respond( out, this.routeDumpCommon( httpreq ) ); break;
+                    case "/classify": this._respond( out, this.routeClassify( httpreq ) ); break;
                 }
 
 
@@ -155,6 +157,15 @@ public class VerySimpleHttp {
             return new HttpResponse( "text/plain", content );
         }
 
+        private HttpResponse routeDumpCommon( HttpRequest req ){
+            classifier.analyseClassifications();
+            String content = "";
+            for ( String str : classifier.commonStr ){
+                content += str + ", ";
+            }
+            return new HttpResponse( "text/plain", content );
+        }
+
         private HttpResponse routeSaveClassifier( HttpRequest req ){
             try {
                  FileOutputStream fileOut =
@@ -169,6 +180,11 @@ public class VerySimpleHttp {
                 i.printStackTrace();
             }
             return new HttpResponse( "text/plain", "" );
+        }
+
+        private HttpResponse routeClassify ( HttpRequest req ){
+            String content = classifier.classify( req.content );
+            return new HttpResponse( "text/plain", content );
         }
     }
 

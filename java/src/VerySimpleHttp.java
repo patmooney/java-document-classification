@@ -135,7 +135,7 @@ public class VerySimpleHttp {
             out.print( resp.content );
             out.flush();
         }
-        
+
         private HttpResponse routeIndex( HttpRequest req ) {
             HttpResponse resp = new HttpResponse( "application/json", "{ \"name\": \"patrick\" }" );
             return resp;
